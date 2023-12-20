@@ -1,6 +1,7 @@
 const {Router} = require("express");
 const nodemailer = require("nodemailer");
 const { CURRENT_MOVIES, FEATURED_MOVIES} = require("../mockData/moviesMockData");
+require("dotenv").config();
 
 const router = Router();
 
@@ -52,21 +53,13 @@ router.post("/receipt", (req, res) => {
         price,
     } = req.body;
 
-    console.log({
-        name,
-        lastname,
-        email,
-        seats,
-        price,
-    })
-
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
         secure: true,
         auth: {
-            user: 'pupaplexcinema@gmail.com',
-            pass: 'ceva byhb zgsh qzne'
+            user: process.env.login,
+            pass: process.env.password
         },
     });
 

@@ -10,15 +10,15 @@ router.post("/", (req, res) => {
         port: 465,
         secure: true,
         auth: {
-            user: 'amaliya070104@gmail.com',
-            pass: 'ihyq hihk gqvj wgpc'
+            user: process.env.login,
+            pass: process.env.password
         }
     });
 
     const mailOptions = {
         from: 'pupa-plex-cinema@gmail.com',
         to: emailToSend,
-        subject: '',
+        subject: 'Pupaplex',
         text: 'Ви підписалися на новини'
     };
 

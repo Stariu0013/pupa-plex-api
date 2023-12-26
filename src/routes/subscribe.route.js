@@ -1,6 +1,7 @@
 const {Router} = require("express");
 const nodemailer = require("nodemailer");
 const {google} = require("googleapis");
+require("dotenv").config();
 const router = Router();
 
 const oAuth2Client = new google.auth.OAuth2({

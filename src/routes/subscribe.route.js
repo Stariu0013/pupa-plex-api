@@ -1,17 +1,33 @@
 const {Router} = require("express");
 const nodemailer = require("nodemailer");
+const {google} = require("googleapis");
 const router = Router();
 
-router.post("/", (req, res) => {
+const oAuth2Client = new google.auth.OAuth2({
+    clientId: process.env.clientId,
+    clientSecret: process.env.clientSecret,
+    redirectUri: process.env.redirectUrl
+});
+
+oAuth2Client.setCredentials({refresh_token: process.env.refreshToken });
+
+
+router.post("/", async (req, res) => {
     const emailToSend = req.body.email;
 
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
+    const accessToken = await oAuth2Client.getAccessToken();
+    const transport = nodemailer.createTransport({
+        service: "gmail",
         auth: {
-            user: process.env.login,
-            pass: process.env.password
+            type: "OAuth2",
+            user: "pupaplexcinema@gmail.com",
+            clientId: process.env.clientId,
+            clientSecret: process.env.clientSecret,
+            refreshToken: process.env.refreshToken,
+            accessToken
+        },
+        tls: {
+            rejectUnauthorized: true,
         }
     });
 
@@ -22,7 +38,7 @@ router.post("/", (req, res) => {
         text: 'Ви підписалися на новини'
     };
 
-    transporter.sendMail(mailOptions, function(error, info){
+    transport.sendMail(mailOptions, function(error, info){
         if (error) {
             console.log(error);
             res.status(400);

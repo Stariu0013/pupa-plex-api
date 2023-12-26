@@ -1,9 +1,18 @@
 const {Router} = require("express");
 const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
 const { CURRENT_MOVIES, FEATURED_MOVIES} = require("../mockData/moviesMockData");
 require("dotenv").config();
 
 const router = Router();
+const oAuth2Client = new google.auth.OAuth2({
+    clientId: process.env.clientId,
+    clientSecret: process.env.clientSecret,
+    redirectUri: process.env.redirectUrl
+});
+
+oAuth2Client.setCredentials({refresh_token: process.env.refreshToken });
+
 
 router.get("/all-movies/", (req, res) => {
     res.status(200).send({
@@ -44,7 +53,7 @@ router.get("/featured-movies/", (req, res) => {
     }
 });
 
-router.post("/receipt", (req, res) => {
+router.post("/receipt", async (req, res) => {
     const {
         name,
         lastname,
@@ -53,14 +62,20 @@ router.post("/receipt", (req, res) => {
         price,
     } = req.body;
 
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
+    const accessToken = await oAuth2Client.getAccessToken();
+    const transport = nodemailer.createTransport({
+        service: "gmail",
         auth: {
-            user: process.env.login,
-            pass: process.env.password
+            type: "OAuth2",
+            user: "pupaplexcinema@gmail.com",
+            clientId: process.env.clientId,
+            clientSecret: process.env.clientSecret,
+            refreshToken: process.env.refreshToken,
+            accessToken
         },
+        tls: {
+            rejectUnauthorized: true,
+        }
     });
 
     const mailOptions = {
@@ -72,7 +87,7 @@ router.post("/receipt", (req, res) => {
         `
     };
 
-    transporter.sendMail(mailOptions, function(error, info){
+    transport.sendMail(mailOptions, function(error, info){
         if (error) {
             console.log(error);
             res.status(400);

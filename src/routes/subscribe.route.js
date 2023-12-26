@@ -13,10 +13,10 @@ const oAuth2Client = new google.auth.OAuth2({
 oAuth2Client.setCredentials({refresh_token: process.env.refreshToken });
 
 
-router.post("/", async (req, res) => {
+router.post("/", (req, res) => {
     const emailToSend = req.body.email;
 
-    const accessToken = await oAuth2Client.getAccessToken();
+    // const accessToken = await oAuth2Client.getAccessToken();
     const transport = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -25,7 +25,7 @@ router.post("/", async (req, res) => {
             clientId: process.env.clientId,
             clientSecret: process.env.clientSecret,
             refreshToken: process.env.refreshToken,
-            accessToken
+            accessToken: process.env.accessToken
         },
         tls: {
             rejectUnauthorized: true,

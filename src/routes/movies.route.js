@@ -53,7 +53,7 @@ router.get("/featured-movies/", (req, res) => {
     }
 });
 
-router.post("/receipt", async (req, res) => {
+router.post("/receipt", (req, res) => {
     const {
         name,
         lastname,
@@ -62,7 +62,7 @@ router.post("/receipt", async (req, res) => {
         price,
     } = req.body;
 
-    const accessToken = await oAuth2Client.getAccessToken();
+    // const accessToken = await oAuth2Client.getAccessToken();
     const transport = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -71,7 +71,7 @@ router.post("/receipt", async (req, res) => {
             clientId: process.env.clientId,
             clientSecret: process.env.clientSecret,
             refreshToken: process.env.refreshToken,
-            accessToken
+            accessToken: process.env.accessToken
         },
         tls: {
             rejectUnauthorized: true,
